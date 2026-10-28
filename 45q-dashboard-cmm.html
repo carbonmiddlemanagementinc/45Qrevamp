@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>45Q Redesign Explorer — Carbon Middle Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #252628;
+    --slate:      #3B3D42;
+    --ash:        #6E6F69;
+    --linen:      #EAE6DE;
+    --chalk:      #FFFFFF;
+    --plains:     #B8A882;
+    --violet:     #535470;
+    --aegean:     #2A4A5E;
+    --steel:      #6B7C8D;
+    --frost:      #C8D5D3;
+    --periwinkle: #7B82C4;
+    --spruce:     #2A4A5E;
+    --font-display: 'Spectral', Georgia, serif;
+    --font-body:    'Source Sans 3', 'Helvetica Neue', sans-serif;
+    --font-mono:    'Inconsolata', 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--chalk);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ══ MASTHEAD ══ */
+  .top-rule { height: 3px; background: var(--ink); }
+  .masthead {
+    padding: 32px 56px 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 48px;
+  }
+  .wordmark {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 10px;
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .page-title em { font-weight: 400; font-style: italic; color: var(--ash); }
+  .page-desc {
+    font-size: 14px;
+    color: var(--ash);
+    margin-top: 10px;
+    max-width: 660px;
+    line-height: 1.65;
+  }
+  .masthead-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--plains);
+    letter-spacing: 0.1em;
+    text-align: right;
+    line-height: 2.1;
+    padding-bottom: 4px;
+  }
+
+  /* ══ TAB NAV ══ */
+  .tab-nav {
+    display: flex;
+    align-items: flex-end;
+    padding: 24px 56px 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .tab-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    color: var(--ash);
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+    bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active {
+    background: var(--chalk);
+    color: var(--ink);
+    border-color: var(--ink);
+    border-bottom-color: var(--chalk);
+    font-weight: 500;
+  }
+  .tab-num { font-size: 9px; color: var(--plains); margin-right: 8px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ══ CONTROLS BAND ══ */
+  .controls-band {
+    background: var(--linen);
+    padding: 40px 56px 36px;
+    border-bottom: 1px solid var(--plains);
+  }
+  .controls-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 28px;
+  }
+
+  /* Three-tier grid */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-left: 1px solid var(--plains);
+    margin-bottom: 0;
+  }
+  .tier-col {
+    padding: 0 36px 28px 28px;
+    border-right: 1px solid var(--plains);
+  }
+  .tier-col:last-child { border-right: none; }
+
+  .tier-accent { height: 3px; margin-bottom: 20px; }
+  .tc-lo .tier-accent  { background: var(--ink); }
+  .tc-hi .tier-accent  { background: var(--aegean); }
+  .tc-dac .tier-accent { background: var(--steel); }
+
+  .tier-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 5px;
+  }
+  .tier-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .tier-value {
+    font-family: var(--font-mono);
+    font-size: 38px;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .tier-conc {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--plains);
+    margin-bottom: 8px;
+  }
+  .tier-rationale {
+    font-size: 12px;
+    color: var(--ash);
+    line-height: 1.55;
+    margin-bottom: 20px;
+    min-height: 52px;
+  }
+  .tier-examples {
+    font-size: 11px;
+    color: var(--ash);
+    font-style: italic;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  input[type=range] {
+    width: 100%;
+    height: 2px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--plains);
+    outline: none;
+    cursor: pointer;
+    display: block;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    background: var(--ink);
+    cursor: pointer;
+    border-radius: 0;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 20px; height: 20px;
+    background: var(--ink);
+    cursor: pointer;
+    border-radius: 0;
+    border: none;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--plains);
+    letter-spacing: 0.06em;
+    margin-top: 7px;
+  }
+  .tier-cost {
+    font-size: 11px;
+    color: var(--ash);
+    margin-top: 12px;
+  }
+  .tier-cost span { font-family: var(--font-mono); color: var(--slate); }
+
+  /* Presets */
+  .presets-row {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--plains);
+    margin-top: 28px;
+    padding-top: 24px;
+  }
+  .presets-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-right: 24px;
+    flex-shrink: 0;
+  }
+  .preset-btn {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid var(--plains);
+    border-right: none;
+    color: var(--ash);
+    font-family: var(--font-body);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.12s;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .preset-btn:last-of-type { border-right: 1px solid var(--plains); }
+  .preset-btn:hover { background: rgba(184,168,130,0.18); color: var(--ink); }
+  .preset-btn.active { background: var(--ink); color: var(--chalk); border-color: var(--ink); }
+  .preset-btn.active + .preset-btn { border-left-color: var(--ink); }
+  .p-name { font-weight: 500; line-height: 1.2; }
+  .p-vals { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; opacity: 0.6; }
+  .reset-btn {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ash);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 0;
+    transition: color 0.12s;
+  }
+  .reset-btn:hover { color: var(--ink); }
+
+  /* ══ RESULTS: two columns ══ */
+  .results-area {
+    padding: 52px 56px 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    border-bottom: 1px solid var(--plains);
+  }
+  .result-col-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--plains);
+  }
+
+  /* JCT */
+  .jct-block { border-top: 3px solid var(--ink); padding-top: 16px; }
+  .jct-figure {
+    font-family: var(--font-mono);
+    font-size: 80px;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    transition: color 0.25s;
+  }
+  .jct-figure.jct-high { color: var(--violet); }
+  .jct-figure.jct-low  { color: var(--spruce); }
+  .jct-unit { font-size: 32px; font-weight: 300; color: var(--ash); }
+  .jct-sub { font-size: 14px; color: var(--ash); margin-top: 10px; margin-bottom: 32px; line-height: 1.5; }
+  .jct-track { height: 2px; background: var(--frost); margin-bottom: 32px; }
+  .jct-fill { height: 100%; background: var(--ink); transition: width 0.35s, background 0.35s; }
+  .jct-breakdown-table { width: 100%; border-collapse: collapse; }
+  .jct-breakdown-table tr { border-bottom: 1px solid var(--plains); }
+  .jct-breakdown-table tr:last-child { border-bottom: none; border-top: 1px solid var(--ink); }
+  .jct-breakdown-table td { padding: 9px 0; font-size: 13px; color: var(--ash); line-height: 1.4; }
+  .jct-breakdown-table td:last-child { font-family: var(--font-mono); font-size: 13px; color: var(--ink); text-align: right; }
+  .jct-breakdown-table .total-row td { color: var(--ink); font-weight: 500; font-size: 14px; }
+  .jct-caveat { margin-top: 18px; font-size: 11px; color: var(--plains); line-height: 1.6; font-style: italic; }
+
+  /* CO2 column */
+  .tonnes-block { border-top: 3px solid var(--ink); padding-top: 16px; }
+  .tonnes-figure {
+    font-family: var(--font-mono);
+    font-size: 80px;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    transition: all 0.25s;
+  }
+  .tonnes-unit { font-size: 32px; font-weight: 300; color: var(--ash); }
+  .tonnes-sub { font-size: 14px; color: var(--ash); margin-top: 10px; margin-bottom: 32px; line-height: 1.5; }
+
+  .sector-group-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--plains);
+  }
+  .sector-bar-row {
+    display: grid;
+    grid-template-columns: 84px 1fr 72px;
+    align-items: center;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--plains);
+  }
+  .sector-bar-row:last-child { border-bottom: none; }
+  .sbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ash); }
+  .sbt { height: 3px; background: var(--frost); }
+  .sbf { height: 100%; transition: width 0.35s; }
+  .sbc { font-family: var(--font-mono); font-size: 11px; color: var(--slate); text-align: right; }
+
+  .context-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--plains);
+    margin-top: 28px;
+  }
+  .context-table { width: 100%; border-collapse: collapse; }
+  .context-table tr { border-bottom: 1px solid var(--plains); }
+  .context-table tr:last-child { border-bottom: none; }
+  .context-table td { padding: 9px 0; font-size: 13px; color: var(--ash); line-height: 1.4; }
+  .context-table td:last-child { font-family: var(--font-mono); font-size: 13px; color: var(--ink); text-align: right; white-space: nowrap; }
+  .context-table .hi-row td { color: var(--ink); font-weight: 500; }
+  .context-table .hi-row td:last-child { color: var(--aegean); }
+
+  /* ══ UNIVERSE BAND ══ */
+  .universe-band { padding: 52px 56px 60px; border-bottom: 1px solid var(--plains); }
+  .universe-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 48px;
+    margin-bottom: 36px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .universe-title { font-family: var(--font-display); font-size: 20px; font-weight: 400; letter-spacing: -0.01em; color: var(--ink); }
+  .universe-subtitle { font-size: 13px; color: var(--ash); margin-top: 4px; line-height: 1.5; max-width: 680px; }
+  .universe-source { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--plains); text-align: right; line-height: 1.8; }
+
+  .universe-total-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--plains);
+    margin-bottom: 36px;
+  }
+  .universe-total-cell { padding: 20px 16px 20px 0; border-right: 1px solid var(--plains); position: relative; }
+  .universe-total-cell:last-child { border-right: none; }
+  .universe-total-cell:not(:first-child) { padding-left: 16px; }
+  .utc-index { position: absolute; top: 0; left: 0; width: 2px; height: 100%; }
+  .utc-num { font-family: var(--font-mono); font-size: 40px; font-weight: 300; color: var(--ink); letter-spacing: -0.04em; line-height: 1; transition: all 0.25s; }
+  .utc-unit { font-size: 18px; font-weight: 300; color: var(--ash); }
+  .utc-label { font-size: 11px; color: var(--ash); margin-top: 6px; line-height: 1.4; }
+
+  .universe-table { width: 100%; border-collapse: collapse; }
+  .universe-table thead th {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ash);
+    padding: 0 20px 12px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--plains);
+    white-space: nowrap;
+  }
+  .universe-table thead th:last-child { text-align: right; padding-right: 0; }
+  .universe-table tbody tr { border-bottom: 1px solid var(--plains); }
+  .universe-table tbody tr:last-child { border-bottom: none; }
+  .universe-table tbody td { padding: 14px 20px 14px 0; font-size: 13px; color: var(--ink); vertical-align: middle; }
+  .universe-table tbody td:last-child { text-align: right; padding-right: 0; }
+
+  .fac-bar-wrap { display: flex; align-items: center; gap: 10px; min-width: 140px; }
+  .fac-bar-track { flex: 1; height: 3px; background: var(--frost); }
+  .fac-bar-fill { height: 100%; transition: width 0.35s; }
+  .fac-bar-num { font-family: var(--font-mono); font-size: 12px; color: var(--slate); min-width: 28px; text-align: right; }
+
+  .viable-cell { font-family: var(--font-mono); font-size: 13px; font-weight: 500; white-space: nowrap; transition: color 0.2s; }
+  .viable-zero { color: var(--ash) !important; font-weight: 400; }
+  .viable-some { color: var(--aegean) !important; }
+  .viable-most { color: var(--spruce) !important; }
+  .cost-range-cell { font-family: var(--font-mono); font-size: 11px; color: var(--ash); white-space: nowrap; }
+  .tier-pill { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border: 1px solid var(--plains); color: var(--ash); white-space: nowrap; }
+  .tier-pill-lo  { border-color: var(--ink);    color: var(--ink); }
+  .tier-pill-hi  { border-color: var(--aegean); color: var(--aegean); }
+  .tier-pill-dac { border-color: var(--steel);  color: var(--steel); }
+
+  .universe-caveat { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--plains); font-size: 11px; color: var(--plains); line-height: 1.6; font-style: italic; max-width: 860px; }
+
+  /* ══ PROJECTS TAB ══ */
+  .projects-tab-body { padding: 40px 56px 64px; }
+  .projects-intro {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 32px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .projects-intro-text { font-size: 14px; color: var(--ash); line-height: 1.65; max-width: 640px; }
+  .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+  .filter-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ash); margin-right: 8px; }
+  .filter-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 14px; border: 1px solid var(--plains); color: var(--ash); cursor: pointer; background: transparent; transition: all 0.1s; }
+  .filter-tag:hover { border-color: var(--ash); color: var(--slate); }
+  .filter-tag.active { border-color: var(--ink); color: var(--ink); background: var(--linen); font-weight: 500; }
+
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table thead th { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); padding: 0 20px 14px 0; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--plains); }
+  .data-table tbody tr { border-bottom: 1px solid var(--plains); transition: background 0.1s; }
+  .data-table tbody tr:hover { background: rgba(184,168,130,0.07); }
+  .data-table tbody td { padding: 18px 20px 18px 0; font-size: 13px; color: var(--ink); vertical-align: top; }
+  .td-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+  .td-loc { font-family: var(--font-mono); font-size: 10px; color: var(--plains); margin-top: 3px; letter-spacing: 0.04em; }
+  .td-note { font-size: 12px; color: var(--ash); line-height: 1.5; margin-top: 6px; max-width: 320px; }
+  .td-cap { font-family: var(--font-mono); font-size: 12px; color: var(--slate); white-space: nowrap; }
+  .td-credit { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+
+  .tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border: 1px solid; display: inline-block; white-space: nowrap; }
+  .tag-cement    { color: var(--aegean);     border-color: var(--aegean); }
+  .tag-steel     { color: var(--steel);      border-color: var(--steel); }
+  .tag-dac       { color: var(--plains);     border-color: var(--plains); }
+  .tag-petro     { color: var(--slate);      border-color: var(--slate); }
+  .tag-ammonia   { color: var(--violet);     border-color: var(--violet); }
+  .tag-ethanol   { color: var(--spruce);     border-color: var(--spruce); }
+  .tag-h2        { color: var(--periwinkle); border-color: var(--periwinkle); }
+
+  .badge { display: inline-block; font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; white-space: nowrap; }
+  .b-op   { background: rgba(42,74,94,0.1);    color: var(--spruce); }
+  .b-con  { background: rgba(184,168,130,0.22); color: var(--ash); }
+  .b-feed { background: rgba(107,124,141,0.12); color: var(--steel); }
+  .b-dev  { background: rgba(110,111,105,0.1);  color: var(--ash); }
+  .b-can  { background: rgba(83,84,112,0.1);    color: var(--violet); text-decoration: line-through; }
+
+  .deploy-pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; white-space: nowrap; }
+  .dp-yes  { background: rgba(42,74,94,0.1);    color: var(--spruce); }
+  .dp-marg { background: rgba(83,84,112,0.1);   color: var(--violet); }
+  .dp-no   { background: rgba(110,111,105,0.1); color: var(--ash); }
+  .dp-dot  { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .dd-yes  { background: var(--spruce); }
+  .dd-marg { background: var(--violet); }
+  .dd-no   { background: var(--ash); }
+
+
+  /* ══ PHASE-DOWN TAB ══ */
+  .pd-start { font-family: var(--font-mono); font-size: 11px; color: var(--slate); letter-spacing: 0.04em; margin: -16px 0 24px; }
+  .pd-start b { font-weight: 500; color: var(--ink); }
+  .pd-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-left: 1px solid var(--plains); }
+  .pd-col { padding: 0 32px 8px 28px; border-right: 1px solid var(--plains); }
+  .pd-col:last-child { border-right: none; }
+  .pd-col-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .pd-col-desc { font-size: 12px; color: var(--ash); line-height: 1.5; margin-bottom: 18px; min-height: 36px; }
+  .pd-ctl { margin-bottom: 20px; }
+  .pd-ctl-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .pd-ctl-label { font-size: 12px; color: var(--slate); }
+  .pd-ctl-val { font-family: var(--font-mono); font-size: 20px; font-weight: 300; color: var(--ink); letter-spacing: -0.02em; }
+  .pd-hint { font-size: 11px; color: var(--ash); margin-top: 6px; line-height: 1.45; }
+  .seg { display: flex; border: 1px solid var(--plains); }
+  .seg-btn { flex: 1; padding: 7px 8px; background: transparent; border: none; border-right: 1px solid var(--plains); font-family: var(--font-body); font-size: 12px; color: var(--ash); cursor: pointer; transition: all 0.12s; line-height: 1.25; }
+  .seg-btn:last-child { border-right: none; }
+  .seg-btn:hover { background: rgba(184,168,130,0.18); color: var(--ink); }
+  .seg-btn.active { background: var(--ink); color: var(--chalk); }
+
+  .pd-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 44px 56px 0; }
+  .pd-kpi { border: 1px solid var(--ink); border-top-width: 3px; padding: 16px 18px 18px; }
+  .pd-kpi-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ash); margin-bottom: 12px; line-height: 1.5; min-height: 27px; }
+  .pd-kpi-num { font-family: var(--font-mono); font-size: 44px; font-weight: 300; letter-spacing: -0.04em; line-height: 1; color: var(--ink); }
+  .pd-kpi-unit { font-size: 18px; color: var(--ash); }
+  .pd-kpi-cmp { font-size: 12px; color: var(--ash); margin-top: 10px; line-height: 1.5; }
+  .pd-kpi-cmp span { font-family: var(--font-mono); color: var(--slate); }
+  .pd-delta-good { color: var(--aegean) !important; font-weight: 500; }
+  .pd-delta-bad  { color: var(--violet) !important; font-weight: 500; }
+
+  .pd-findings { margin: 28px 56px 0; padding: 18px 0 4px; border-top: 1px solid var(--plains); display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .pd-finding { font-size: 13px; color: var(--slate); line-height: 1.6; }
+  .pd-finding-k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ash); margin-bottom: 6px; }
+
+  .pd-section { padding: 48px 56px 0; }
+  .pd-section-head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 32px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); margin-bottom: 24px; }
+  .pd-section-title { font-family: var(--font-display); font-size: 20px; font-weight: 400; letter-spacing: -0.01em; }
+  .pd-section-sub { font-size: 13px; color: var(--ash); margin-top: 4px; line-height: 1.5; max-width: 720px; }
+  .pd-legend { display: flex; gap: 20px; flex-wrap: wrap; font-size: 11px; color: var(--ash); }
+  .pd-legend-item { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .pd-legend svg { display: block; }
+
+  .pd-charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 32px; }
+  .pd-chart-cell { position: relative; }
+  .pd-chart-title { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .pd-chart-title b { font-weight: 500; color: var(--ink); }
+  .pd-chart-cell svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .pd-row-label { grid-column: 1 / -1; font-size: 12px; color: var(--slate); padding-top: 4px; border-top: 1px solid var(--plains); padding-top: 14px; }
+  .pd-row-label b { font-weight: 600; color: var(--ink); }
+  .pd-tip { position: absolute; pointer-events: none; background: var(--chalk); border: 1px solid var(--ink); padding: 8px 10px; font-size: 11px; color: var(--slate); line-height: 1.55; white-space: nowrap; display: none; z-index: 5; }
+  .pd-tip b { font-family: var(--font-mono); font-weight: 500; color: var(--ink); }
+  .pd-tip .k { display: inline-block; width: 14px; vertical-align: middle; }
+
+  .pd-two { display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; }
+  .pd-table { width: 100%; border-collapse: collapse; }
+  .pd-table th { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); text-align: left; padding: 0 12px 10px 0; border-bottom: 1px solid var(--plains); white-space: nowrap; }
+  .pd-table td { padding: 11px 12px 11px 0; border-bottom: 1px solid var(--plains); font-size: 13px; vertical-align: top; }
+  .pd-table tr:last-child td { border-bottom: none; }
+  .pd-v-period { font-family: var(--font-mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+  .pd-v-cr { font-family: var(--font-mono); font-size: 14px; color: var(--ink); }
+  .pd-v-ev { font-size: 11px; color: var(--ash); margin-top: 2px; line-height: 1.35; }
+  .pd-v-ev.pause { color: var(--violet); }
+
+  .pd-mix-row { display: grid; grid-template-columns: 116px 1fr 74px; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--plains); }
+  .pd-mix-row:last-child { border-bottom: none; }
+  .pd-mix-name { font-size: 12px; color: var(--slate); line-height: 1.25; }
+  .pd-mix-bars { display: flex; flex-direction: column; gap: 2px; }
+  .pd-mix-bar { height: 5px; border-radius: 0 3px 3px 0; transition: width 0.3s; min-width: 1px; }
+  .pd-mix-val { font-family: var(--font-mono); font-size: 11px; color: var(--slate); text-align: right; line-height: 1.35; }
+  .pd-mix-val span { color: var(--ash); }
+
+  .pd-sens { width: 100%; border-collapse: collapse; }
+  .pd-sens th { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--plains); }
+  .pd-sens td { border-bottom: 1px solid var(--plains); border-right: 1px solid var(--plains); padding: 12px 16px; vertical-align: top; cursor: pointer; transition: background 0.1s; }
+  .pd-sens td:first-child { font-family: var(--font-mono); font-size: 13px; color: var(--ink); padding-left: 0; cursor: default; border-right: 1px solid var(--plains); width: 90px; }
+  .pd-sens td:last-child { border-right: none; }
+  .pd-sens td:not(:first-child):hover { background: rgba(184,168,130,0.12); }
+  .pd-sens td.sel { outline: 2px solid var(--ink); outline-offset: -2px; background: var(--linen); }
+  .pd-s-main { font-family: var(--font-mono); font-size: 16px; color: var(--ink); }
+  .pd-s-sub { font-family: var(--font-mono); font-size: 11px; color: var(--ash); margin-top: 3px; }
+
+  .pd-method { padding: 48px 56px 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 40px; }
+  .pd-method-head { grid-column: 1 / -1; font-family: var(--font-display); font-size: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
+  .pd-method-k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ash); margin-bottom: 6px; }
+  .pd-method p { font-size: 12px; color: var(--slate); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .masthead, .tab-nav { padding-left: 16px; padding-right: 16px; }
+    .masthead { grid-template-columns: 1fr; gap: 12px; }
+    .controls-band { padding: 28px 16px; }
+    .presets-row { flex-wrap: wrap; gap: 8px; }
+    .pd-grid, .pd-charts, .pd-findings, .pd-two, .pd-method { grid-template-columns: 1fr; }
+    .pd-col { border-right: none; border-bottom: 1px solid var(--plains); padding: 0 0 12px 16px; margin-bottom: 16px; }
+    .pd-kpis { grid-template-columns: 1fr 1fr; padding: 32px 16px 0; }
+    .pd-section, .pd-method { padding-left: 16px; padding-right: 16px; }
+    .pd-findings { margin-left: 16px; margin-right: 16px; }
+    .pd-section-head { grid-template-columns: 1fr; }
+  }
+
+  /* ══ FOOTER ══ */
+  .footer { border-top: 3px solid var(--ink); padding: 28px 56px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; }
+  .footer-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 6px; }
+  .footer-name em { font-weight: 400; font-style: italic; }
+  .footer-meta { font-family: var(--font-mono); font-size: 10px; color: var(--ash); letter-spacing: 0.08em; line-height: 2.1; }
+</style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+<div class="masthead">
+  <div>
+    <div class="wordmark">Carbon Middle Management — Interactive Analysis</div>
+    <div class="page-title">45Q Redesign <em>Explorer</em></div>
+    <div class="page-desc">A three-tier concentration-based credit structure: below 30% CO₂ (hard industrial), above 30% CO₂ (high-concentration), and direct air capture. The 30% threshold separates sectors where capture requires genuine post-combustion separation work from those producing near-pure CO₂ streams as a process byproduct.</div>
+  </div>
+  <div class="masthead-meta">
+    Three-tier concentration model<br>
+    Named U.S. projects · Q1 2026<br>
+    Draft for review
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" id="tab-overview" onclick="switchTab('overview')">
+    <span class="tab-num">01</span>Overview
+  </button>
+  <button class="tab-btn" id="tab-projects" onclick="switchTab('projects')">
+    <span class="tab-num">02</span>Named projects
+  </button>
+  <button class="tab-btn" id="tab-phase" onclick="switchTab('phase')">
+    <span class="tab-num">03</span>Phase-down
+  </button>
+</div>
+
+<!-- ═══════════════════════════════
+     TAB 1: OVERVIEW
+═══════════════════════════════ -->
+<div class="tab-panel active" id="panel-overview">
+
+  <div class="controls-band">
+    <div class="controls-eyebrow">Credit levels — $/tonne CO₂ stored. Drag to adjust.</div>
+
+    <div class="tier-grid">
+
+      <!-- TIER 1: LOW CONCENTRATION -->
+      <div class="tier-col tc-lo">
+        <div class="tier-accent"></div>
+        <div class="tier-header-row">
+          <div class="tier-name">Tier 1 — Low-concentration</div>
+          <div class="tier-value" id="val-lo">$125</div>
+        </div>
+        <div class="tier-conc">Below 30% CO₂ in flue stream</div>
+        <div class="tier-rationale">Genuine post-combustion separation required. Chemical absorption with high energy penalty. The sectors with fewest decarbonization alternatives — cement, steel, SMR flue gas, coal power.</div>
+        <div class="tier-examples">Cement kilns (14–22%), blast furnace steel (~22%), SMR furnace flue gas (5–10%), coal power (10–15%), FCC units (0–5%)</div>
+        <input type="range" id="slider-lo" min="50" max="200" value="125" step="5" oninput="update()">
+        <div class="slider-labels"><span>$50</span><span>$200</span></div>
+        <div class="tier-cost">Capture cost range: <span>$65–$165/t</span> (DOE Liftoff, 2023)</div>
+      </div>
+
+      <!-- TIER 2: HIGH CONCENTRATION -->
+      <div class="tier-col tc-hi">
+        <div class="tier-accent"></div>
+        <div class="tier-header-row">
+          <div class="tier-name">Tier 2 — High-concentration</div>
+          <div class="tier-value" id="val-hi">$50</div>
+        </div>
+        <div class="tier-conc">Above 30% CO₂ in flue stream</div>
+        <div class="tier-rationale">CO₂ already largely separated as a process necessity. Main cost is compression, dehydration, and transport/storage. Credit should cover T&S costs plus a reasonable margin — not generate large rents.</div>
+        <div class="tier-examples">Ethanol fermentation (&gt;85%), ammonia synthesis loop (~95–100%), natural gas processing (~95–100%), pre-PSA SMR syngas (15–25% at high pressure)</div>
+        <input type="range" id="slider-hi" min="20" max="120" value="50" step="5" oninput="update()">
+        <div class="slider-labels"><span>$20</span><span>$120</span></div>
+        <div class="tier-cost">Capture cost range: <span>$15–$60/t</span> (Pilorgé &amp; Wilcox, 2020; DOE Liftoff, 2023)</div>
+      </div>
+
+      <!-- TIER 3: DAC -->
+      <div class="tier-col tc-dac">
+        <div class="tier-accent"></div>
+        <div class="tier-header-row">
+          <div class="tier-name">Tier 3 — Direct air capture</div>
+          <div class="tier-value" id="val-dac">$250</div>
+        </div>
+        <div class="tier-conc">~420 ppm CO₂ (ambient atmosphere)</div>
+        <div class="tier-rationale">Categorically different from point-source capture. Processing ambient air requires massive volume throughput and high energy input. Credit functions partly as a learning-curve subsidy, not just cost coverage.</div>
+        <div class="tier-examples">Solid sorbent DAC (Heirloom, Carbon Engineering), liquid solvent DAC (Climeworks), all atmospheric CO₂ removal</div>
+        <input type="range" id="slider-dac" min="100" max="400" value="250" step="10" oninput="update()">
+        <div class="slider-labels"><span>$100</span><span>$400</span></div>
+        <div class="tier-cost">Capture cost range: <span>$285–$600/t</span> · IRA baseline: $180/t · DOE target: $100/t by ~2035</div>
+      </div>
+
+    </div><!-- /tier-grid -->
+
+    <div class="presets-row">
+      <span class="presets-label">Presets</span>
+      <button class="preset-btn active" id="preset-opt" onclick="loadPreset('opt')">
+        <span class="p-name">Climate-optimized</span>
+        <span class="p-vals">T1 $125 · T2 $50 · DAC $250</span>
+      </button>
+      <button class="preset-btn" id="preset-mod" onclick="loadPreset('mod')">
+        <span class="p-name">Moderate</span>
+        <span class="p-vals">T1 $110 · T2 $45 · DAC $200</span>
+      </button>
+      <button class="preset-btn" id="preset-current" onclick="loadPreset('current')">
+        <span class="p-name">Current 45Q — flat</span>
+        <span class="p-vals">All point source $85 · DAC $180</span>
+      </button>
+      <button class="reset-btn" onclick="loadPreset('opt')">↺ Reset</button>
+    </div>
+  </div><!-- /controls-band -->
+
+  <!-- RESULTS -->
+  <div class="results-area">
+
+    <!-- JCT -->
+    <div>
+      <div class="result-col-label">10-year JCT estimate</div>
+      <div class="jct-block">
+        <div class="jct-figure" id="jct-value">—<span class="jct-unit">B</span></div>
+        <div class="jct-sub">Estimated federal cost over 10-year window</div>
+        <div class="jct-track"><div class="jct-fill" id="jct-bar" style="width:0%"></div></div>
+        <table class="jct-breakdown-table" id="jct-breakdown"></table>
+        <div class="jct-caveat">Order-of-magnitude estimate. Bankable volume × credit × 10yr, discounted for ramp-up. Excludes existing operations from incremental cost. Not a CBO score. ±50%.</div>
+      </div>
+    </div>
+
+    <!-- CO2 -->
+    <div>
+      <div class="result-col-label">CO₂ capture potential</div>
+      <div class="tonnes-block">
+        <div class="tonnes-figure" id="tonnes-yes">—<span class="tonnes-unit">Mt</span></div>
+        <div class="tonnes-sub">per year from named projects with credit sufficient to advance</div>
+        <div class="sector-group-label">Capture by sector — advancing named projects</div>
+        <div id="sector-bars"></div>
+        <div class="context-label">Context</div>
+        <table class="context-table">
+          <tr><td>Current U.S. CCS operational capacity</td><td>~35 Mt/yr</td></tr>
+          <tr><td>IEA Net Zero 2030 U.S. CCS target</td><td>~200 Mt/yr</td></tr>
+          <tr><td>Rhodium/GPI near-term potential (553 facilities)</td><td>704 Mt/yr</td></tr>
+          <tr><td>U.S. total stationary CO₂ emissions</td><td>~3,900 Mt/yr</td></tr>
+          <tr class="hi-row"><td>Named projects advancing as % of Rhodium potential</td><td id="ctx-pct">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /results-area -->
+
+  <!-- UNIVERSE BAND -->
+  <div class="universe-band">
+    <div class="universe-header">
+      <div>
+        <div class="universe-title">Broader deployment universe — Rhodium/GPI facility population</div>
+        <div class="universe-subtitle">Rough estimate of how many of the 553 technically viable U.S. facilities could become bankable at current credit settings, based on sector cost curves from DOE Liftoff (2023) and Wilcox/Pilorgé (2020). Not a project-level forecast. DAC count from IEA CCUS Projects Database.</div>
+      </div>
+      <div class="universe-source">
+        Rhodium Group / GPI (2021)<br>
+        DOE Liftoff Carbon Mgmt. (2023)<br>
+        Pilorgé &amp; Wilcox, EST (2020)<br>
+        First-order estimate only
+      </div>
+    </div>
+
+    <div class="universe-total-row">
+      <div class="universe-total-cell">
+        <div class="utc-index" style="background:var(--aegean)"></div>
+        <div class="utc-num" id="uni-fac-lo">—</div>
+        <div class="utc-label">Facilities — conservative<br>(credit exceeds cost ceiling)</div>
+      </div>
+      <div class="universe-total-cell">
+        <div class="utc-index" style="background:var(--plains)"></div>
+        <div class="utc-num" id="uni-fac-hi">—</div>
+        <div class="utc-label">Facilities — high estimate<br>(credit exceeds cost floor)</div>
+      </div>
+      <div class="universe-total-cell">
+        <div class="utc-index" style="background:var(--aegean)"></div>
+        <div class="utc-num" id="uni-mt-lo">—<span class="utc-unit"> Mt</span></div>
+        <div class="utc-label">CO₂/yr — conservative<br>from bankable facilities</div>
+      </div>
+      <div class="universe-total-cell">
+        <div class="utc-index" style="background:var(--plains)"></div>
+        <div class="utc-num" id="uni-mt-hi">—<span class="utc-unit"> Mt</span></div>
+        <div class="utc-label">CO₂/yr — high estimate<br>from potentially bankable facilities</div>
+      </div>
+      <div class="universe-total-cell">
+        <div class="utc-index" style="background:var(--ash)"></div>
+        <div class="utc-num">553</div>
+        <div class="utc-label">Total facilities in<br>Rhodium/GPI universe</div>
+      </div>
+    </div>
+
+    <table class="universe-table">
+      <thead>
+        <tr>
+          <th>Sector</th>
+          <th>Tier</th>
+          <th>CO₂ conc. (flue stream)</th>
+          <th>Capture cost range</th>
+          <th>Facilities in Rhodium universe</th>
+          <th>Est. bankable at current credit</th>
+          <th>Est. CO₂ capture (Mt/yr)</th>
+        </tr>
+      </thead>
+      <tbody id="universe-tbody"></tbody>
+    </table>
+
+    <div class="universe-caveat">Methodology: "Bankable" compares the tier credit against each sector's capture cost distribution (DOE Liftoff 2023; Wilcox/Pilorgé 2020). Conservative count = credit exceeds cost ceiling. High count = credit exceeds cost floor. Actual deployment requires CO₂ T&S infrastructure, Class VI well permits, and project financing — all independent of credit level. Refineries and coal power included in Tier 1 universe counts but face additional structural barriers beyond credit level. DAC drawn from IEA CCUS Projects Database rather than Rhodium.</div>
+  </div>
+
+</div><!-- /panel-overview -->
+
+<!-- ═══════════════════════════════
+     TAB 2: NAMED PROJECTS
+═══════════════════════════════ -->
+<div class="tab-panel" id="panel-projects">
+  <div class="projects-tab-body">
+    <div class="projects-intro">
+      <div class="projects-intro-text">19 named U.S. projects tracked — the subset of the Rhodium/GPI universe of 553 technically viable facilities that have entered active development. Under the three-tier structure, projects are assigned to Tier 1 (below 30% CO₂ concentration), Tier 2 (above 30%), or DAC. Credits reflect current slider settings from the Overview tab.</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--plains);letter-spacing:0.1em;text-align:right;line-height:2">
+        Rhodium / GPI (2021)<br>
+        Global CCS Institute (2024)<br>
+        DOE Liftoff (2023)
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Sector</span>
+      <button class="filter-tag active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-tag" onclick="setFilter('cement',this)">Cement</button>
+      <button class="filter-tag" onclick="setFilter('steel',this)">Steel</button>
+      <button class="filter-tag" onclick="setFilter('dac',this)">DAC</button>
+      <button class="filter-tag" onclick="setFilter('h2',this)">Hydrogen</button>
+      <button class="filter-tag" onclick="setFilter('petro',this)">Petrochems</button>
+      <button class="filter-tag" onclick="setFilter('ethanol',this)">Ethanol</button>
+      <button class="filter-tag" onclick="setFilter('ammonia',this)">Ammonia</button>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Project / Facility</th>
+          <th>Sector</th>
+          <th>Status</th>
+          <th>Capture</th>
+          <th>Tier · Credit</th>
+          <th>Deployment outcome</th>
+        </tr>
+      </thead>
+      <tbody id="project-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════
+     TAB 3: PHASE-DOWN ANALYSIS
+═══════════════════════════════ -->
+<div class="tab-panel" id="panel-phase">
+
+  <div class="controls-band">
+    <div class="controls-eyebrow">Phase-down design. New entrants lock the credit in force the year they first claim 45Q; existing claimants are grandfathered.</div>
+    <div class="pd-start" id="pd-start"></div>
+
+    <div class="pd-grid">
+
+      <!-- STEP-DOWN -->
+      <div class="pd-col">
+        <div class="tier-accent" style="background:var(--ink)"></div>
+        <div class="pd-col-title">Step-down schedule</div>
+        <div class="pd-col-desc">The credit available to new entrants falls by a fixed share at each interval, down to a floor. Projects keep the credit of their entry year for the whole credit period.</div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Step-down per interval</span><span class="pd-ctl-val" id="pd-step-v">7%</span></div>
+          <input type="range" id="pd-step" min="5" max="10" step="1" value="7" oninput="pdRead()">
+          <div class="slider-labels"><span>5%</span><span>10%</span></div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Interval between steps</span><span class="pd-ctl-val" id="pd-int-v">4 yrs</span></div>
+          <input type="range" id="pd-int" min="3" max="5" step="1" value="4" oninput="pdRead()">
+          <div class="slider-labels"><span>3 yrs</span><span>5 yrs</span></div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Floor (share of starting credit)</span><span class="pd-ctl-val" id="pd-floor-v">60%</span></div>
+          <input type="range" id="pd-floor" min="50" max="90" step="5" value="60" oninput="pdRead()">
+          <div class="slider-labels"><span>50%</span><span>90%</span></div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Phase-down applies to</span></div>
+          <div class="seg" id="pd-apply">
+            <button class="seg-btn active" data-t="lo" onclick="pdToggleApply(this)">Tier 1</button>
+            <button class="seg-btn" data-t="hi" onclick="pdToggleApply(this)">Tier 2</button>
+            <button class="seg-btn active" data-t="dac" onclick="pdToggleApply(this)">DAC</button>
+          </div>
+          <div class="pd-hint">Tier 2 is off by default: its costs are mostly compression and T&amp;S, with little learning left to capture, and certainty is the point of the lower credit.</div>
+        </div>
+      </div>
+
+      <!-- BANKABILITY -->
+      <div class="pd-col">
+        <div class="tier-accent" style="background:var(--aegean)"></div>
+        <div class="pd-col-title">Bankability</div>
+        <div class="pd-col-desc">Terms that raise what a credit is worth to a lender without raising its face value.</div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Credit period</span><span class="pd-ctl-val" id="pd-n-v">15 yrs</span></div>
+          <input type="range" id="pd-n" min="12" max="20" step="1" value="15" oninput="pdRead()">
+          <div class="slider-labels"><span>12 yrs (current)</span><span>20 yrs</span></div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Inflation index</span></div>
+          <div class="seg" data-key="index">
+            <button class="seg-btn" data-v="none" onclick="pdSeg(this)">None</button>
+            <button class="seg-btn active" data-v="gdp" onclick="pdSeg(this)">General<br>(current law)</button>
+            <button class="seg-btn" data-v="plant" onclick="pdSeg(this)">Plant-cost<br>index</button>
+          </div>
+          <div class="pd-hint">Current law already indexes 45Q to general inflation. A plant-cost index (CEPCI-type) tracks capture equipment costs, which have run about 1 pt/yr above general inflation.</div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Direct pay (taxable entities)</span></div>
+          <div class="seg" data-key="dp">
+            <button class="seg-btn" data-v="5" onclick="pdSeg(this)">First 5 yrs<br>(current law)</button>
+            <button class="seg-btn active" data-v="full" onclick="pdSeg(this)">Full credit<br>period</button>
+          </div>
+          <div class="pd-hint">After the direct pay window, credits are assumed to sell on the transfer market at $0.93 per $1.</div>
+        </div>
+      </div>
+
+      <!-- RATCHET -->
+      <div class="pd-col">
+        <div class="tier-accent" style="background:var(--steel)"></div>
+        <div class="pd-col-title">Ratchet and learning</div>
+        <div class="pd-col-desc">At each step date, a tier steps down only if its new capacity is on track. Below 90% of benchmark the step pauses; below 60% the last step reverses.</div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Ratchet</span></div>
+          <div class="seg" data-key="ratchet">
+            <button class="seg-btn active" data-v="on" onclick="pdSeg(this)">On</button>
+            <button class="seg-btn" data-v="off" onclick="pdSeg(this)">Off (fixed schedule)</button>
+          </div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Benchmark: share of tier potential online by 2035</span><span class="pd-ctl-val" id="pd-tgt-v">45%</span></div>
+          <input type="range" id="pd-tgt" min="20" max="60" step="5" value="45" oninput="pdRead()">
+          <div class="slider-labels"><span>20%</span><span>60%</span></div>
+        </div>
+        <div class="pd-ctl">
+          <div class="pd-ctl-head"><span class="pd-ctl-label">Learning rate (cost cut per doubling of deployment)</span></div>
+          <div class="seg" data-key="learn">
+            <button class="seg-btn" data-v="low" onclick="pdSeg(this)">Low</button>
+            <button class="seg-btn active" data-v="central" onclick="pdSeg(this)">Central</button>
+            <button class="seg-btn" data-v="high" onclick="pdSeg(this)">High</button>
+          </div>
+          <div class="pd-hint" id="pd-learn-hint"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="presets-row">
+      <span class="presets-label">Compare against</span>
+      <button class="preset-btn active" id="pd-cmp-flat" onclick="pdCompare('flat')">
+        <span class="p-name">Same tiers, no reform</span>
+        <span class="p-vals">No phase-down · 12 yrs · general index · 5-yr direct pay</span>
+      </button>
+      <button class="preset-btn" id="pd-cmp-current" onclick="pdCompare('current')">
+        <span class="p-name">Current 45Q</span>
+        <span class="p-vals">$85 point source · $180 DAC · 12 yrs</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="pd-kpis">
+    <div class="pd-kpi">
+      <div class="pd-kpi-label">10-year outlays, 2027–2036<br>New entrants, nominal</div>
+      <div class="pd-kpi-num" id="pd-k1">—</div>
+      <div class="pd-kpi-cmp" id="pd-k1c"></div>
+    </div>
+    <div class="pd-kpi">
+      <div class="pd-kpi-label">CO₂ stored, 2027–2036<br>New entrants</div>
+      <div class="pd-kpi-num" id="pd-k2">—</div>
+      <div class="pd-kpi-cmp" id="pd-k2c"></div>
+    </div>
+    <div class="pd-kpi">
+      <div class="pd-kpi-label">Full-life outlays, 2027–2040 entrants<br>Real 2026 dollars</div>
+      <div class="pd-kpi-num" id="pd-k3">—</div>
+      <div class="pd-kpi-cmp" id="pd-k3c"></div>
+    </div>
+    <div class="pd-kpi">
+      <div class="pd-kpi-label">Tonnes per $1B of credit<br>Full life, credited tonnes</div>
+      <div class="pd-kpi-num" id="pd-k4">—</div>
+      <div class="pd-kpi-cmp" id="pd-k4c"></div>
+    </div>
+  </div>
+
+  <div class="pd-findings" id="pd-findings"></div>
+
+  <!-- CHARTS -->
+  <div class="pd-section">
+    <div class="pd-section-head">
+      <div>
+        <div class="pd-section-title">Credit schedule against capture cost, and the deployment it buys</div>
+        <div class="pd-section-sub">Top row: credit available to a project entering in each year (statutory 2026 dollars) against the learning-adjusted median capture cost for the tier. Bottom row: cumulative new capacity online against the ratchet benchmark. Hover for values.</div>
+      </div>
+      <div class="pd-legend" id="pd-legend"></div>
+    </div>
+    <div class="pd-charts" id="pd-charts"></div>
+  </div>
+
+  <!-- VINTAGES + MIX -->
+  <div class="pd-section">
+    <div class="pd-two">
+      <div>
+        <div class="pd-section-head"><div>
+          <div class="pd-section-title">Vintage credits</div>
+          <div class="pd-section-sub">Credit locked in by projects that first claim 45Q in each period (statutory 2026 dollars, before indexing), with the ratchet decision taken at the start of the period.</div>
+        </div></div>
+        <table class="pd-table" id="pd-vintage"></table>
+      </div>
+      <div>
+        <div class="pd-section-head"><div>
+          <div class="pd-section-title">Where the tonnes come from</div>
+          <div class="pd-section-sub">New capacity online in 2040 by sector, Mt/yr. Upper bar: your design. Lower bar: comparison.</div>
+        </div></div>
+        <div id="pd-mix"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENSITIVITY -->
+  <div class="pd-section">
+    <div class="pd-section-head">
+      <div>
+        <div class="pd-section-title">Phase-down sensitivity: 5–10% steps every 3–5 years</div>
+        <div class="pd-section-sub">Each cell compares your design against the same design with no phase-down, holding every other setting. Top: full-life outlays saved (real 2026 $B). Middle: credited tonnes forgone. Bottom: dollars saved per tonne forgone. When that last figure sits well above the credit level, the phase-down is mostly trimming payments to projects that would have been built anyway. Click a cell to apply it.</div>
+      </div>
+    </div>
+    <table class="pd-sens" id="pd-sens"></table>
+  </div>
+
+  <!-- METHOD -->
+  <div class="pd-method">
+    <div class="pd-method-head">How the simulation works</div>
+    <div><div class="pd-method-k">Deployment</div><p>Each sector in the Rhodium/GPI universe from Tab 01 has a capture cost range. In each entry year, the share of a sector that is bankable is the Tab 01 midpoint rule applied to the effective credit. Eight percent of the bankable-but-unbuilt potential comes online each year from 2029. Coal is discounted to 25% and refineries to 50% of potential for barriers unrelated to the credit. Existing operations are excluded and unaffected.</p></div>
+    <div><div class="pd-method-k">Learning</div><p>Capture cost falls with cumulative tier deployment on an experience curve. Central rates: Tier 1 10%, Tier 2 3%, DAC 15% per doubling (low 5/1/8, high 15/5/20), from an assumed experience base of 20, 25 and 1 Mt/yr. Point-source rates follow analog technologies in Rubin et al. (2007); DAC follows Young et al. (2023). Costs bottom out at 65%, 90% and 40% of today's.</p></div>
+    <div><div class="pd-method-k">Credit period and financing</div><p>Costs are levelized over the credit period at an 8% real cost of capital, with capital at 55% (Tier 1), 35% (Tier 2) and 60% (DAC) of cost. A 12-year period reproduces Tab 01. Extending it spreads capital recovery over more years, which lowers the credit a project needs. Credited tonnes count only within the credit period.</p></div>
+    <div><div class="pd-method-k">Indexing</div><p>All results assume 2.3% general inflation. "None" lets the statutory amount erode in real terms. "General" holds it constant in real terms, as current law does. "Plant-cost" adds 1%/yr real, matching the assumed escalation of capital costs (Chemical Engineering Plant Cost Index against the GDP deflator).</p></div>
+    <div><div class="pd-method-k">Fiscal window</div><p>10-year outlays are nominal credits claimed in 2027–2036 at 85% utilization, the window a JCT score would see. Full-life outlays add every year of every 2027–2040 vintage's credit period in real 2026 dollars. Neither is a JCT or CBO score. Treat as ±50%, and read differences between designs, not levels.</p></div>
+    <div><div class="pd-method-k">Not comparable to Tab 01</div><p>Tab 01 scores 19 named projects. This tab simulates the whole facility universe, so its levels are larger. Its purpose is to compare designs under one consistent set of assumptions. Sources: DOE Liftoff Carbon Management (2023); Rhodium/GPI (2021); Rubin et al., Int. J. Greenhouse Gas Control (2007); Young et al., One Earth (2023); 26 U.S.C. §45Q as amended by Pub. L. 119-21.</p></div>
+  </div>
+</div><!-- /panel-phase -->
+
+<div class="footer">
+  <div>
+    <div class="footer-name">Carbon <em>Middle Management</em></div>
+    <div class="footer-meta" style="margin-top:6px">45Q Redesign Explorer · Three-Tier Structure · March 2026</div>
+  </div>
+  <div class="footer-meta">
+    Sources<br>
+    DOE Liftoff Carbon Mgmt. (2023)<br>
+    Pilorgé &amp; Wilcox, EST (2020)<br>
+    Rhodium Group / GPI (2021)<br>
+    Global CCS Institute (2024)
+  </div>
+  <div class="footer-meta">
+    Methodology<br>
+    30% CO₂ concentration threshold<br>
+    JCT: volume × credit × 10yr<br>
+    Named projects as of Q1 2026<br>
+    Phase-down: vintage simulation
+    Order-of-magnitude only
+  </div>
+</div>
+
+<script>
+// ═══════════════════════
+// NAMED PROJECTS
+// tier: 'lo' = below 30% CO₂, 'hi' = above 30%, 'dac' = DAC
+// ═══════════════════════
+const PROJECTS = [
+  // DAC
+  { id:'stratos',      name:'Stratos (1PointFive / Oxy)',           loc:'Ector Co., TX',           sector:'dac',     status:'op',  cap:500,   tier:'dac',
+    deploy:c=>c.dac>=160?'yes':'marg',
+    note:c=>c.dac>=180?`$${c.dac}/t improves hub expansion economics beyond $180 IRA baseline`:`$${c.dac}/t below $180 IRA baseline — weakens future hub economics` },
+  { id:'cypress',      name:'Heirloom / Project Cypress',           loc:'Louisiana',               sector:'dac',     status:'con', cap:1000,  tier:'dac',
+    deploy:c=>c.dac>=200?'yes':c.dac>=160?'marg':'no',
+    note:c=>c.dac>=200?`$${c.dac}/t supports DOE hub scale-up economics`:`$${c.dac}/t below hub threshold; DOE co-funding still required` },
+  { id:'stx-dac',      name:'1PointFive — South Texas DAC Hub',     loc:'King Ranch, TX',          sector:'dac',     status:'dev', cap:500,   tier:'dac',
+    deploy:c=>c.dac>=220?'yes':c.dac>=170?'marg':'no',
+    note:c=>c.dac>=220?`$${c.dac}/t above IRA baseline; improves hub FID economics`:c.dac>=170?`$${c.dac}/t marginal — DOE co-funding still required`:`$${c.dac}/t below $180 IRA baseline — step backward` },
+
+  // TIER 1 — LOW CONCENTRATION (below 30% CO₂)
+  // Cement
+  { id:'mitchell',     name:'Heidelberg Materials — Mitchell IN',   loc:'Mitchell, IN',            sector:'cement',  status:'can', cap:2000,  tier:'lo',
+    deploy:c=>c.lo>=115?'yes':c.lo>=100?'marg':'no',
+    note:c=>c.lo>=115?`$${c.lo}/t Tier 1 could make this viable without DOE grant — project potentially revivable`:c.lo>=100?`Marginal; still needs co-funding to replace canceled DOE grant`:`Insufficient standalone without restored DOE funding` },
+  { id:'lebec',        name:'National Cement / Vicat — Lebec CA',  loc:'Lebec, CA',               sector:'cement',  status:'can', cap:500,   tier:'lo',
+    deploy:c=>c.lo>=130?'marg':'no',
+    note:c=>c.lo>=130?`$${c.lo}/t helps but CA storage geology challenging; still needs co-funding`:`Insufficient; needs restored DOE grant and favorable storage` },
+  { id:'genevieve',    name:'Holcim — St. Genevieve MO',           loc:'St. Genevieve, MO',       sector:'cement',  status:'feed',cap:2750,  tier:'lo',
+    deploy:c=>c.lo>=115?'yes':c.lo>=95?'marg':'no',
+    note:c=>c.lo>=115?`$${c.lo}/t closes cost gap for large, well-sited Midwest plant`:c.lo>=95?`Marginal — good geology and scale may bridge remaining gap`:`~$${145-c.lo}/t gap remains; project stalls` },
+  { id:'portland-co',  name:'Holcim — Portland CO (CO2MENT)',       loc:'Florence, CO',            sector:'cement',  status:'feed',cap:100,   tier:'lo',
+    deploy:c=>c.lo>=120?'marg':'no',
+    note:c=>c.lo>=120?`Pilot-to-commercial decision supported at $${c.lo}/t`:`$${c.lo}/t insufficient to trigger commercial scale-up from pilot` },
+  // Steel
+  { id:'burns-harbor', name:'Cleveland-Cliffs — Burns Harbor BF',  loc:'Burns Harbor, IN',        sector:'steel',   status:'dev', cap:1500,  tier:'lo',
+    deploy:c=>c.lo>=130?'marg':'no',
+    note:c=>c.lo>=130?`$${c.lo}/t approaches BF-BOF cost range ($85–155/t); conditional FID possible`:`Below blast furnace CCS cost range; remains pre-FID` },
+  { id:'arcelor-feed', name:'ArcelorMittal / U. Illinois FEED',     loc:'Indiana Harbor, IN',      sector:'steel',   status:'feed',cap:900,   tier:'lo',
+    deploy:c=>c.lo>=110?'yes':c.lo>=90?'marg':'no',
+    note:c=>c.lo>=110?`HBI off-gas more concentrated than BF; $${c.lo}/t likely crosses bankability threshold`:c.lo>=90?`Marginal — favorable HBI concentration may bridge gap`:`Insufficient for HBI CCS economics` },
+  { id:'ussteel-gary', name:'U.S. Steel Gary — CarbonFree',         loc:'Gary, IN',                sector:'steel',   status:'dev', cap:50,    tier:'lo',
+    deploy:c=>'marg',
+    note:c=>`Mineralization / utilization pathway — Tier 1 geological storage credit less directly applicable. Phase 1 at 50 kt only.` },
+  // Hydrogen (SMR furnace flue gas = below 30%)
+  { id:'baytown',      name:'ExxonMobil Baytown Low-Carbon H₂',     loc:'Baytown, TX',             sector:'h2',      status:'feed',cap:7000,  tier:'lo',
+    deploy:c=>c.lo>=85?'yes':'marg',
+    note:c=>`SMR/ATR process. $${c.lo}/t Tier 1 `+(c.lo>=85?'covers cost; ADNOC backing reduces risk':'marginal — ADNOC equity may compensate') },
+  { id:'air-products', name:'Air Products Blue H₂ — Gulf Coast',    loc:'Louisiana / TX',          sector:'h2',      status:'feed',cap:5000,  tier:'lo',
+    deploy:c=>c.lo>=80?'yes':'marg',
+    note:c=>`ATR technology. $${c.lo}/t Tier 1 `+(c.lo>=80?'covers costs; project advances':'marginal at this level') },
+  // Petrochems
+  { id:'chevron-kern', name:'Chevron — Kern River CCUS',             loc:'Kern County, CA',         sector:'petro',   status:'feed',cap:300,   tier:'lo',
+    deploy:c=>c.lo>=100?'yes':c.lo>=75?'marg':'no',
+    note:c=>c.lo>=100?`$${c.lo}/t covers refinery cost; EOR revenue adds support`:c.lo>=75?`Marginal — EOR revenue may bridge gap`:`$${c.lo}/t insufficient for refinery CCS standalone` },
+
+  // TIER 2 — HIGH CONCENTRATION (above 30% CO₂)
+  // Steel DRI — process off-gas is concentrated
+  { id:'nucor-exxon',  name:'Nucor / ExxonMobil DRI CCS',           loc:'Convent, LA',             sector:'steel',   status:'con', cap:800,   tier:'hi',
+    deploy:c=>c.hi>=40?'yes':'marg',
+    note:c=>`DRI off-gas near-pure CO₂; cost ~$20–30/t. $${c.hi}/t `+(c.hi>=40?'comfortably covers cost and T&S':'marginal — barely covers transport and storage') },
+  // Ethanol
+  { id:'poet-nav',     name:'POET / Navigator CO₂ Ventures',         loc:'Midwest corn belt',       sector:'ethanol', status:'dev', cap:15000, tier:'hi',
+    deploy:c=>c.hi>=30?'marg':'no',
+    note:c=>`Fermentation off-gas >85% CO₂; cost ~$15–20/t. $${c.hi}/t covers capture but T&S infrastructure is the binding constraint.` },
+  { id:'adm-decatur',  name:'ADM — Decatur IL',                     loc:'Decatur, IL',             sector:'ethanol', status:'op',  cap:1100,  tier:'hi',
+    deploy:c=>c.hi>=20?'yes':'marg',
+    note:c=>`Already operating. Fermentation off-gas >85% CO₂. $${c.hi}/t `+(c.hi>=20?'more than covers operating economics':'threatens continued viability') },
+  { id:'green-plains', name:'Green Plains — York NE',                loc:'York, NE',                sector:'ethanol', status:'op',  cap:100,   tier:'hi',
+    deploy:c=>c.hi>=20?'yes':'marg',
+    note:c=>`Operating 2025. Fermentation off-gas >85% CO₂. $${c.hi}/t `+(c.hi>=20?'covers ethanol CCS economics':'below breakeven — threatens viability') },
+  // Ammonia
+  { id:'cf-ind',       name:'CF Industries / Berkshire Hathaway',   loc:'Yazoo City, MS',          sector:'ammonia', status:'feed',cap:2000,  tier:'hi',
+    deploy:c=>c.hi>=25?'yes':'marg',
+    note:c=>`Ammonia synthesis loop CO₂ ~95–100%; cost $15–25/t. $${c.hi}/t `+(c.hi>=25?'provides strong margin':'barely covers costs') },
+  { id:'wabash',       name:'Wabash Valley Resources — NH₃ + CCS',  loc:'W. Terre Haute, IN',      sector:'ammonia', status:'dev', cap:1750,  tier:'hi',
+    deploy:c=>c.hi>=30?'yes':c.hi>=20?'marg':'no',
+    note:c=>c.hi>=30?`High-purity CO₂ stream; $${c.hi}/t covers costs`:`Gasification slightly higher cost; $${c.hi}/t marginal` },
+];
+
+// ═══════════════════════
+// UNIVERSE DATA
+// Tier assignment based on 30% CO₂ threshold
+// ═══════════════════════
+const UNIVERSE_SECTORS = [
+  // TIER 1 — below 30% CO₂
+  { name:'Cement',          tier:'lo', facilities:87,  avg_mt:1.0, cost_lo:100, cost_hi:160, color:'#2A4A5E', conc:'14–22%',
+    note:'14–22 vol% CO₂ (combined combustion + calcination stack). DOE Liftoff (2023): $100–160/t. No decarbonization alternative to CCS for process emissions.' },
+  { name:'Steel (BF-BOF)',  tier:'lo', facilities:9,   avg_mt:2.5, cost_lo:85,  cost_hi:155, color:'#6B7C8D', conc:'~22% (BF top gas)',
+    note:'~22 vol% CO₂ in blast furnace top gas; captive power plant at 12–15%. DOE Liftoff (2023): $85–155/t. Multiple capture points per mill.' },
+  { name:'Refineries',      tier:'lo', facilities:59,  avg_mt:0.6, cost_lo:100, cost_hi:165, color:'#3B3D42', conc:'0–5% (FCC); 15–25% (H₂ unit)',
+    note:'FCC regenerator at 0–5 vol% CO₂ — among the most dilute streams. On-site H₂ units at 15–25%. DOE Liftoff (2023): $100–165/t. Highly dispersed emissions, complex multi-stack facilities.' },
+  { name:'Hydrogen (SMR)',  tier:'lo', facilities:61,  avg_mt:2.2, cost_lo:65,  cost_hi:100, color:'#7B82C4', conc:'5–10% (flue); 15–25% (syngas)',
+    note:'SMR furnace flue gas at 5–10 vol%, syngas pre-PSA at 15–25%. Both below 30% threshold. DOE Liftoff (2023): $65–100/t for 90% capture.' },
+  { name:'Coal power',      tier:'lo', facilities:62,  avg_mt:3.5, cost_lo:50,  cost_hi:100, color:'#535470', conc:'10–15%',
+    note:'Post-combustion flue gas at 10–15 vol% CO₂. Liftoff: ~$50–100/t. Faces structural barriers beyond credit: uncertain asset life, competing retirement incentives, and limited political support. Facility count from Rhodium near-term viable coal fleet.' },
+
+  // TIER 2 — above 30% CO₂
+  { name:'Ethanol',         tier:'hi', facilities:174, avg_mt:0.5, cost_lo:25,  cost_hi:60,  color:'#2A4A5E', conc:'>85% (fermentation)',
+    note:'Fermentation off-gas >85 vol% CO₂ — near-pure byproduct. DOE Liftoff (2023): $25–60/t. Upper range reflects smaller, less-optimized plants. Primary constraint is T&S pipeline infrastructure.' },
+  { name:'Ammonia / gas',   tier:'hi', facilities:62,  avg_mt:1.0, cost_lo:15,  cost_hi:35,  color:'#B8A882', conc:'95–100% (synthesis loop)',
+    note:'Ammonia synthesis loop and natural gas sweetening produce ~95–100% CO₂ streams already separated as process necessity. Pilorgé & Wilcox (2020): $15–35/t for byproduct streams. SMR combustion flue gas (~5–10%) excluded.' },
+
+  // DAC
+  { name:'DAC (U.S. pipeline)', tier:'dac', facilities:38, avg_mt:0.5, cost_lo:285, cost_hi:600, color:'#6B7C8D', conc:'~420 ppm (ambient)',
+    note:'~38 U.S.-focused DAC projects in IEA CCUS database. DOE Liftoff (2023): $285–600/t solid sorbent. No facility bankable on credit alone without DOE co-funding. Credit functions as learning-curve investment, not pure cost coverage.' },
+];
+
+const SECTOR_NAMES = {cement:'Cement',steel:'Steel',dac:'DAC',petro:'Petrochems',ammonia:'Ammonia',ethanol:'Ethanol',h2:'Hydrogen'};
+const SECTOR_COLORS = {cement:'#2A4A5E',steel:'#6B7C8D',dac:'#B8A882',petro:'#3B3D42',ammonia:'#535470',ethanol:'#2A4A5E',h2:'#7B82C4'};
+const STATUS_MAP = {op:['b-op','Operating'],con:['b-con','Construction'],feed:['b-feed','FEED / Dev.'],dev:['b-dev','Development'],can:['b-can','Cancelled']};
+let activeFilter = 'all';
+
+function getCredits() {
+  return {
+    lo:  +document.getElementById('slider-lo').value,
+    hi:  +document.getElementById('slider-hi').value,
+    dac: +document.getElementById('slider-dac').value,
+  };
+}
+function getCredit(p,c){ return p.tier==='lo'?c.lo:p.tier==='hi'?c.hi:c.dac; }
+
+function update() {
+  const c = getCredits();
+  document.getElementById('val-lo').textContent  = '$'+c.lo;
+  document.getElementById('val-hi').textContent  = '$'+c.hi;
+  document.getElementById('val-dac').textContent = '$'+c.dac;
+
+  const presets = {
+    opt:     {lo:125, hi:50,  dac:250},
+    mod:     {lo:110, hi:45,  dac:200},
+    current: {lo:85,  hi:85,  dac:180},
+  };
+  ['opt','mod','current'].forEach(k=>{
+    const p=presets[k];
+    document.getElementById('preset-'+k).classList.toggle('active', c.lo===p.lo&&c.hi===p.hi&&c.dac===p.dac);
+  });
+
+  renderOverview(c);
+  renderUniverse(c);
+  renderProjectTable(c);
+  renderPhase(c);
+}
+
+function renderOverview(c) {
+  let mtYes=0, mtMarg=0;
+  const bySector={};
+  PROJECTS.forEach(p=>{
+    const st=p.deploy(c);
+    if(st==='yes')mtYes+=p.cap/1000;
+    else if(st==='marg')mtMarg+=p.cap/1000;
+    if(!bySector[p.sector])bySector[p.sector]={yes:0,marg:0,no:0,mt:0};
+    bySector[p.sector][st]++;
+    if(st==='yes')bySector[p.sector].mt+=p.cap/1000;
+  });
+
+  document.getElementById('tonnes-yes').innerHTML=mtYes.toFixed(0)+'<span class="tonnes-unit">Mt</span>';
+  document.getElementById('ctx-pct').textContent=((mtYes/704)*100).toFixed(1)+'% of Rhodium potential';
+
+  const maxMt=Math.max(...Object.values(bySector).map(d=>d.mt),1);
+  document.getElementById('sector-bars').innerHTML=Object.entries(bySector)
+    .filter(([,d])=>d.yes>0||d.marg>0)
+    .sort((a,b)=>b[1].mt-a[1].mt)
+    .map(([s,d])=>{
+      const pct=(d.mt/maxMt)*100;
+      const cap=d.mt>=1?d.mt.toFixed(1)+' Mt':Math.round(d.mt*1000)+' kt';
+      return `<div class="sector-bar-row">
+        <div class="sbl">${SECTOR_NAMES[s]}</div>
+        <div class="sbt"><div class="sbf" style="width:${pct}%;background:${SECTOR_COLORS[s]}"></div></div>
+        <div class="sbc">${cap}/yr</div>
+      </div>`;
+    }).join('');
+
+  // JCT
+  const BASE=43, RAMP=0.72;
+  let newCost=0; const bd={};
+  PROJECTS.forEach(p=>{
+    if(['adm-decatur','green-plains','stratos'].includes(p.id))return;
+    const st=p.deploy(c),cr=getCredit(p,c);
+    const vol=st==='yes'?p.cap:st==='marg'?p.cap*0.4:0;
+    if(vol>0){
+      const cb=(vol*1000*cr*RAMP*10)/1e9;
+      newCost+=cb;
+      bd[p.sector]=(bd[p.sector]||0)+cb;
+    }
+  });
+  const total=BASE+newCost;
+  const jel=document.getElementById('jct-value');
+  jel.innerHTML='$'+total.toFixed(0)+'<span class="jct-unit">B</span>';
+  jel.className='jct-figure'+(total>120?' jct-high':total<70?' jct-low':'');
+  const bar=document.getElementById('jct-bar');
+  bar.style.width=Math.min(100,(total/200)*100)+'%';
+  bar.style.background=total>120?'var(--violet)':total<70?'var(--spruce)':'var(--ink)';
+  const rows=Object.entries(bd).sort((a,b)=>b[1]-a[1])
+    .map(([s,v])=>`<tr><td>${SECTOR_NAMES[s]||s} (new projects)</td><td>$${v.toFixed(1)}B</td></tr>`).join('');
+  document.getElementById('jct-breakdown').innerHTML=
+    `<tr><td>Existing operations baseline</td><td>$${BASE}B</td></tr>`+rows+
+    `<tr class="total-row"><td>Total (10-year)</td><td>$${total.toFixed(0)}B</td></tr>`;
+}
+
+function renderUniverse(c) {
+  const getC=tier=>tier==='lo'?c.lo:tier==='hi'?c.hi:c.dac;
+  let totFacLo=0,totFacHi=0,totMtLo=0,totMtHi=0;
+  const maxFac=Math.max(...UNIVERSE_SECTORS.map(s=>s.facilities));
+
+  document.getElementById('universe-tbody').innerHTML=UNIVERSE_SECTORS.map(s=>{
+    const credit=getC(s.tier);
+    const frac_lo=credit>=s.cost_hi?1:credit<=s.cost_lo?0:(credit-s.cost_lo)/(s.cost_hi-s.cost_lo);
+    const frac_hi=credit<s.cost_lo?0:Math.min(1,frac_lo+0.35);
+    const facLo=Math.round(s.facilities*frac_lo);
+    const facHi=Math.min(s.facilities,Math.round(s.facilities*frac_hi));
+    const mtLo=facLo*s.avg_mt;
+    const mtHi=facHi*s.avg_mt;
+    totFacLo+=facLo; totFacHi+=facHi; totMtLo+=mtLo; totMtHi+=mtHi;
+
+    const barPct=(s.facilities/maxFac)*100;
+    const isDac=s.tier==='dac';
+    let vText,vClass;
+    if(facLo===0&&facHi===0){vText='None — credit below cost floor';vClass='viable-zero';}
+    else if(facLo>=s.facilities*0.8){vText=`~${facLo}–${facHi} of ${s.facilities}`;vClass='viable-most';}
+    else{
+      vText=isDac?`~${facLo}–${facHi} of ${s.facilities} (co-funding req.)`:`~${facLo}–${facHi} of ${s.facilities}`;
+      vClass=facLo>0?'viable-some':'viable-zero';
+    }
+    const fmtMt=v=>v>=10?Math.round(v)+' Mt':v>0?v.toFixed(1)+' Mt':'0';
+    const mtText=(mtLo===0&&mtHi===0)?'—':`~${fmtMt(mtLo)}–${fmtMt(mtHi)}/yr`;
+    const mtClass=mtLo===0?'viable-zero':mtLo>50?'viable-most':'viable-some';
+
+    const pillClass=s.tier==='lo'?'tier-pill-lo':s.tier==='hi'?'tier-pill-hi':'tier-pill-dac';
+    const pillLabel=s.tier==='lo'?'Tier 1':s.tier==='hi'?'Tier 2':'DAC';
+
+    return `<tr>
+      <td>
+        <div style="font-weight:500">${s.name}</div>
+        <div style="font-size:11px;color:var(--ash);line-height:1.4;margin-top:3px;max-width:240px">${s.note}</div>
+      </td>
+      <td><span class="tier-pill ${pillClass}">${pillLabel}</span></td>
+      <td class="cost-range-cell">${s.conc}</td>
+      <td class="cost-range-cell">$${s.cost_lo}–$${s.cost_hi}/t</td>
+      <td>
+        <div class="fac-bar-wrap">
+          <div class="fac-bar-track"><div class="fac-bar-fill" style="width:${barPct}%;background:${s.color}"></div></div>
+          <div class="fac-bar-num">${s.facilities}</div>
+        </div>
+      </td>
+      <td class="viable-cell ${vClass}">${vText}</td>
+      <td class="viable-cell ${mtClass}" style="font-size:13px">${mtText}</td>
+    </tr>`;
+  }).join('');
+
+  const fmt=v=>v>=10?Math.round(v):v.toFixed(0);
+  document.getElementById('uni-fac-lo').textContent=totFacLo;
+  document.getElementById('uni-fac-hi').textContent=totFacHi;
+  document.getElementById('uni-mt-lo').innerHTML=fmt(totMtLo)+'<span class="utc-unit"> Mt</span>';
+  document.getElementById('uni-mt-hi').innerHTML=fmt(totMtHi)+'<span class="utc-unit"> Mt</span>';
+}
+
+function renderProjectTable(c) {
+  const visible=PROJECTS.filter(p=>activeFilter==='all'||p.sector===activeFilter);
+  const tierLabel=t=>t==='lo'?'Tier 1':t==='hi'?'Tier 2':'DAC';
+  document.getElementById('project-tbody').innerHTML=visible.map(p=>{
+    const st=p.deploy(c),cr=getCredit(p,c);
+    const [bcls,blbl]=STATUS_MAP[p.status]||['b-dev','Development'];
+    const cap=p.cap>=1000?(p.cap/1000).toFixed(1)+' Mt/yr':p.cap+' kt/yr';
+    const dcls=st==='yes'?'dp-yes':st==='marg'?'dp-marg':'dp-no';
+    const dlbl=st==='yes'?'Advances':st==='marg'?'Marginal':'Stranded';
+    const dotcls=st==='yes'?'dd-yes':st==='marg'?'dd-marg':'dd-no';
+    return `<tr>
+      <td>
+        <div class="td-name">${p.name}</div>
+        <div class="td-loc">${p.loc}</div>
+        <div class="td-note">${p.note(c)}</div>
+      </td>
+      <td><span class="tag tag-${p.sector}">${SECTOR_NAMES[p.sector]}</span></td>
+      <td><span class="badge ${bcls}">${blbl}</span></td>
+      <td class="td-cap">${cap}</td>
+      <td class="td-credit">${tierLabel(p.tier)} · $${cr}/t</td>
+      <td><div class="deploy-pill ${dcls}"><span class="dp-dot ${dotcls}"></span>${dlbl}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function setFilter(sector,btn){
+  activeFilter=sector;
+  document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProjectTable(getCredits());
+}
+
+function loadPreset(key){
+  const p={opt:{lo:125,hi:50,dac:250},mod:{lo:110,hi:45,dac:200},current:{lo:85,hi:85,dac:180}}[key];
+  document.getElementById('slider-lo').value=p.lo;
+  document.getElementById('slider-hi').value=p.hi;
+  document.getElementById('slider-dac').value=p.dac;
+  update();
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ═══ PHASE-DOWN SIMULATION (prototype; pasted into dashboard) ═══
+const SIM = {
+  Y0: 2027, YEND: 2040, ONLINE: 2029, WIN_END: 2036,
+  INFL: 0.023,        // assumed long-run general inflation
+  PLANT_ESC: 0.010,   // plant-cost index (CEPCI) real escalation above general inflation
+  WACC: 0.08,         // real WACC for levelizing
+  UTIL: 0.85,         // capacity utilization of nameplate
+  TRANSFER: 0.93,     // value of $1 of credit monetized by transfer (vs direct pay)
+  DP_YEARS: 5,        // current-law elective pay window for taxable entities
+  ADOPT: 0.08,        // share of bankable-but-unbuilt potential that comes online each year
+  TIERS: {
+    lo:  { capex:0.55, floor:0.65, X0:20 },
+    hi:  { capex:0.35, floor:0.90, X0:25 },
+    dac: { capex:0.60, floor:0.40, X0:1  },
+  },
+  LEARN: { low:{lo:0.05,hi:0.01,dac:0.08}, central:{lo:0.10,hi:0.03,dac:0.15}, high:{lo:0.15,hi:0.05,dac:0.20} },
+  REALIZE: { 'Coal power':0.25, 'Refineries':0.5 },
+};
+
+const crf = (r,n)=> r/(1-Math.pow(1+r,-n));
+const af  = (r,n)=> (1-Math.pow(1+r,-n))/r;
+
+// Levelized value of $1 of entry-year real credit over N years, given index + direct pay
+function creditLevel(N, index, dpFull){
+  const g = index==='none' ? 1/(1+SIM.INFL)-1 : index==='plant' ? SIM.PLANT_ESC : 0;
+  let pv=0;
+  for(let j=0;j<N;j++){
+    const mon = (dpFull || j<SIM.DP_YEARS) ? 1 : SIM.TRANSFER;
+    pv += Math.pow(1+g,j)*mon/Math.pow(1+SIM.WACC,j+1);
+  }
+  return pv/af(SIM.WACC,N);
+}
+const REF_LEVEL = creditLevel(12,'gdp',false);  // current-law structure = Tab 01 calibration
+function periodFactor(N, capex){ return (1-capex) + capex*crf(SIM.WACC,N)/crf(SIM.WACC,12); }
+
+function frac(x, lo, hi){ // Tab 01 midpoint of conservative & high bankable fractions
+  const cons = x>=hi?1:x<=lo?0:(x-lo)/(hi-lo);
+  const high = x<lo?0:Math.min(1,cons+0.35);
+  return (cons+high)/2;
+}
+
+// cfg: {credits:{lo,hi,dac}, step, interval, floor, N, index, dpFull, ratchet, target, apply:{lo,hi,dac}}
+function simulate(cfg, sectors){
+  const out = { tiers:{}, years:[] };
+  for(let y=SIM.Y0;y<=SIM.YEND;y++) out.years.push(y);
+  const lvl = creditLevel(cfg.N,cfg.index,cfg.dpFull)/REF_LEVEL;
+  let win$=0, winMt=0, life$=0, lifeMt=0, outWin$=0;
+
+  for(const t of ['lo','hi','dac']){
+    const P = SIM.TIERS[t];
+    const secs = sectors.filter(s=>s.tier===t).map(s=>({...s, pot:s.facilities*s.avg_mt*(SIM.REALIZE[s.name]??1), C:0}));
+    const potTot = secs.reduce((a,s)=>a+s.pot,0);
+    const b = -Math.log2(1-SIM.LEARN[cfg.learn||'central'][t]);
+    const pf = periodFactor(cfg.N, P.capex);
+    const target = cfg.target*potTot;
+    const traj = y => Math.min(potTot, target*Math.max(0,(y-2028)/(2035-2028)));
+
+    let steps=0, C=0;
+    const rows=[];
+    for(let y=SIM.Y0;y<=SIM.YEND;y++){
+      // step-down decision at step dates
+      let event=null;
+      if(cfg.apply[t] && cfg.step>0 && y>SIM.Y0 && (y-SIM.Y0)%cfg.interval===0){
+        const T = traj(y-1), ratio = T>0 ? C/T : 1;
+        if(!cfg.ratchet || ratio>=0.9){ steps++; event={type:'step',ratio}; }
+        else if(ratio>=0.6){ event={type:'pause',ratio}; }
+        else { if(steps>0){steps--; event={type:'reverse',ratio};} else event={type:'pause',ratio}; }
+      }
+      const stepF = Math.max(cfg.floor, Math.pow(1-cfg.step,steps));
+      const cr0 = cfg.credits[t]*stepF;                       // statutory amount, 2026 $
+      const real = cfg.index==='none' ? cr0/Math.pow(1+SIM.INFL,y-2026)
+                 : cfg.index==='plant' ? cr0*Math.pow(1+SIM.PLANT_ESC,y-2026) : cr0;
+      const E = real*lvl;                                    // effective levelized credit
+      const m = Math.max(P.floor, Math.pow((P.X0+C)/P.X0,-b)); // learning
+      const esc = P.capex*Math.pow(1+SIM.PLANT_ESC,y-SIM.Y0)+(1-P.capex);
+      const M = m*esc*pf;
+      let B=0, costMid=0, wsum=0, add=0;
+      secs.forEach(s=>{
+        const Bs=s.pot*frac(E,s.cost_lo*M,s.cost_hi*M);
+        B+=Bs; costMid+=s.pot*(s.cost_lo+s.cost_hi)/2*M; wsum+=s.pot;
+        const a = y>=SIM.ONLINE ? SIM.ADOPT*Math.max(0,Bs-s.C) : 0;
+        s.C+=a; add+=a;
+      });
+      costMid/=wsum;
+      C+=add;
+      rows.push({y, steps, stepF, cr0, real, E, costMid, B, add, C, traj:traj(y), event});
+    }
+    // outlays by vintage
+    let tw$=0,twMt=0,tl$=0,tlMt=0;
+    rows.forEach(r=>{
+      if(!r.add) return;
+      for(let j=0;j<cfg.N;j++){
+        const yy=r.y+j, P_y=Math.pow(1+SIM.INFL,yy-2026);
+        const nom = cfg.index==='none' ? r.cr0 : cfg.index==='plant' ? r.cr0*P_y*Math.pow(1+SIM.PLANT_ESC,yy-2026) : r.cr0*P_y;
+        const mt = r.add*SIM.UTIL;
+        const usd = mt*1e6*nom/1e9;          // $B nominal
+        tl$ += usd/P_y; tlMt += mt;          // lifetime in real 2026 $
+        if(yy<=SIM.WIN_END){ tw$+=usd; twMt+=mt; } else outWin$ += usd/P_y;
+      }
+    });
+    out.tiers[t]={rows,potTot,win$:tw$,winMt:twMt,life$:tl$,lifeMt:tlMt,
+      C2035:rows.find(r=>r.y===2035).C, C2040:rows.at(-1).C, bySector:secs.map(s=>({name:s.name,C:s.C,pot:s.pot}))};
+    win$+=tw$; winMt+=twMt; life$+=tl$; lifeMt+=tlMt;
+  }
+  Object.assign(out,{win$,winMt,life$,lifeMt,outWin$});
+  return out;
+}
+
+
+
+// ═══════════════════════
+// TAB 03: PHASE-DOWN UI
+// ═══════════════════════
+const PD = { step:7, interval:4, floor:60, N:15, index:'gdp', dp:'full', ratchet:'on', target:45, learn:'central',
+             apply:{lo:true,hi:false,dac:true}, compare:'flat' };
+const PD_TIER = {
+  lo:  { name:'Tier 1', long:'Tier 1 · below 30% CO₂', color:'#252628' },
+  hi:  { name:'Tier 2', long:'Tier 2 · above 30% CO₂', color:'#2A4A5E' },
+  dac: { name:'DAC',    long:'Direct air capture',     color:'#6B7C8D' },
+};
+const PD_CMP = '#6E6F69', PD_REF = '#535470';
+
+function pdCfg(c){
+  return { credits:{lo:c.lo,hi:c.hi,dac:c.dac}, step:PD.step/100, interval:PD.interval, floor:PD.floor/100, N:PD.N,
+           index:PD.index, dpFull:PD.dp==='full', ratchet:PD.ratchet==='on', target:PD.target/100, learn:PD.learn, apply:PD.apply };
+}
+function pdCmpCfg(c){
+  const cr = PD.compare==='current' ? {lo:85,hi:85,dac:180} : {lo:c.lo,hi:c.hi,dac:c.dac};
+  return { credits:cr, step:0, interval:4, floor:1, N:12, index:'gdp', dpFull:false, ratchet:false,
+           target:PD.target/100, learn:PD.learn, apply:{lo:false,hi:false,dac:false} };
+}
+
+function pdRead(){
+  PD.step=+document.getElementById('pd-step').value;
+  PD.interval=+document.getElementById('pd-int').value;
+  PD.floor=+document.getElementById('pd-floor').value;
+  PD.N=+document.getElementById('pd-n').value;
+  PD.target=+document.getElementById('pd-tgt').value;
+  document.getElementById('pd-step-v').textContent=PD.step+'%';
+  document.getElementById('pd-int-v').textContent=PD.interval+' yrs';
+  document.getElementById('pd-floor-v').textContent=PD.floor+'%';
+  document.getElementById('pd-n-v').textContent=PD.N+' yrs';
+  document.getElementById('pd-tgt-v').textContent=PD.target+'%';
+  renderPhase(getCredits());
+}
+function pdSeg(btn){
+  const g=btn.parentElement, key=g.dataset.key;
+  g.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  PD[key]=btn.dataset.v;
+  renderPhase(getCredits());
+}
+function pdToggleApply(btn){
+  const t=btn.dataset.t; PD.apply={...PD.apply,[t]:!PD.apply[t]};
+  btn.classList.toggle('active',PD.apply[t]);
+  renderPhase(getCredits());
+}
+function pdCompare(k){
+  PD.compare=k;
+  document.getElementById('pd-cmp-flat').classList.toggle('active',k==='flat');
+  document.getElementById('pd-cmp-current').classList.toggle('active',k==='current');
+  renderPhase(getCredits());
+}
+function pdSetCell(s,i){
+  document.getElementById('pd-step').value=s;
+  document.getElementById('pd-int').value=i;
+  pdRead();
+}
+
+// formatting
+const fB  = v => '$'+(Math.abs(v)>=100?Math.round(v):Math.abs(v)>=10?Math.round(v):v.toFixed(1))+'B';
+const fMt = v => Math.abs(v)>=1000 ? (v/1000).toFixed(2)+' Gt' : Math.round(v)+' Mt';
+function fDelta(v, fmt, goodIfNeg){
+  if(Math.abs(v)<0.05) return '<span>no change</span>';
+  const good = goodIfNeg ? v<0 : v>0;
+  const s = (v>0?'+':'−') + fmt(Math.abs(v)).replace('$','$');
+  return `<span class="${good?'pd-delta-good':'pd-delta-bad'}">${s}</span>`;
+}
+
+function renderPhase(c){
+  if(!document.getElementById('pd-charts')) return;
+  const L=SIM.LEARN[PD.learn];
+  document.getElementById('pd-start').innerHTML =
+    `Starting credits carried over from the Overview tab: Tier 1 <b>$${c.lo}</b> · Tier 2 <b>$${c.hi}</b> · DAC <b>$${c.dac}</b> per tonne`;
+  document.getElementById('pd-learn-hint').textContent =
+    `Tier 1 ${L.lo*100}% · Tier 2 ${L.hi*100}% · DAC ${L.dac*100}% per doubling. Low learning is the case the ratchet insures against.`;
+
+  const d  = simulate(pdCfg(c), UNIVERSE_SECTORS);
+  const k  = simulate(pdCmpCfg(c), UNIVERSE_SECTORS);
+  const nf = simulate({...pdCfg(c), step:0}, UNIVERSE_SECTORS);
+  const cmpName = PD.compare==='current' ? 'Current 45Q' : 'No reform';
+
+  // KPIs
+  const tpb = r => r.life$>0 ? r.lifeMt/r.life$ : 0;
+  document.getElementById('pd-k1').innerHTML = fB(d.win$);
+  document.getElementById('pd-k1c').innerHTML = `${cmpName}: <span>${fB(k.win$)}</span> · ${fDelta(d.win$-k.win$, fB, true)}`;
+  document.getElementById('pd-k2').innerHTML = fMt(d.winMt).replace(/ (Mt|Gt)/,'<span class="pd-kpi-unit"> $1</span>');
+  document.getElementById('pd-k2c').innerHTML = `${cmpName}: <span>${fMt(k.winMt)}</span> · ${fDelta(d.winMt-k.winMt, fMt, false)}`;
+  document.getElementById('pd-k3').innerHTML = fB(d.life$);
+  document.getElementById('pd-k3c').innerHTML = `${cmpName}: <span>${fB(k.life$)}</span> · ${fDelta(d.life$-k.life$, fB, true)}<br>Credited tonnes: <span>${fMt(d.lifeMt)}</span> vs <span>${fMt(k.lifeMt)}</span>`;
+  document.getElementById('pd-k4').innerHTML = tpb(d).toFixed(1)+'<span class="pd-kpi-unit"> Mt</span>';
+  document.getElementById('pd-k4c').innerHTML = `${cmpName}: <span>${tpb(k).toFixed(1)} Mt</span> · ${fDelta(tpb(d)-tpb(k), v=>v.toFixed(1)+' Mt', false)}<br>Average credit paid: <span>$${Math.round(1000/tpb(d))}/t</span> vs <span>$${Math.round(1000/tpb(k))}/t</span>`;
+
+  // Findings
+  const anyApply = Object.values(PD.apply).some(Boolean);
+  const savLife = nf.life$-d.life$, savWin = nf.win$-d.win$, lostMt = nf.lifeMt-d.lifeMt;
+  const outShare = d.outWin$/d.life$*100;
+  let f1 = anyApply
+    ? `The phase-down saves <b>${fB(savLife)}</b> over the full life of 2027–2040 entrants, but only ${fB(savWin)} of that lands inside the 10-year window. `
+    : `No tier is set to phase down. `;
+  f1 += `${Math.round(outShare)}% of this design's full-life outlays fall after 2036, where a 10-year score does not see them`
+      + (PD.N>12 ? `. The cost of extending to a ${PD.N}-year credit period lands almost entirely there.` : '.');
+
+  const evs = t => { const e=d.tiers[t].rows.filter(r=>r.event).map(r=>r.event.type);
+    return {s:e.filter(x=>x==='step').length,p:e.filter(x=>x==='pause').length,r:e.filter(x=>x==='reverse').length,n:e.length}; };
+  let f2parts=[];
+  ['lo','hi','dac'].forEach(t=>{
+    if(!PD.apply[t]) return;
+    const e=evs(t);
+    if(t==='dac' && d.tiers.dac.C2040<0.05){ f2parts.push(`No DAC capacity is bankable on the credit alone at $${c.dac}/t, so ${PD.ratchet==='on'?'the ratchet holds the DAC credit at its starting level':'the fixed schedule cuts a credit nobody is claiming'}.`); return; }
+    f2parts.push(`${PD_TIER[t].name} steps down ${e.s} of ${e.n} scheduled times`+(e.p?`, pauses ${e.p}`:'')+(e.r?`, reverses ${e.r}`:'')+'.');
+  });
+  let f2 = PD.ratchet==='on' ? f2parts.join(' ') : 'Ratchet off: steps follow the fixed schedule whatever deployment does. '+f2parts.join(' ');
+  if(!anyApply) f2='Ratchet inactive: no tier is phasing down.';
+  if(anyApply && lostMt>1) f2 += ` Credited tonnes forgone versus no phase-down: ${fMt(lostMt)} (${(lostMt/nf.lifeMt*100).toFixed(1)}%).`;
+  else if(anyApply) f2 += ' No credited tonnes are forgone versus no phase-down.';
+
+  const r40 = d.tiers.lo.rows.at(-1), k40 = k.tiers.lo.rows.at(-1);
+  const gap = (r40.E/r40.costMid-1)*100;
+  let f3 = `A Tier 1 project entering in 2040 gets an effective <b>$${Math.round(r40.E)}/t</b> against a median capture cost of $${Math.round(r40.costMid)}/t (${cmpName}: $${Math.round(k40.E)}/t). `;
+  f3 += gap>15 ? `The credit still clears the median project by ${Math.round(gap)}%, which leaves room for steeper steps or a lower floor.`
+      : gap<-5 ? `The credit has fallen below the median project; a higher floor or slower steps would protect the cement and refinery tail.`
+      : `The credit tracks the median project closely: the schedule is roughly matched to learning.`;
+
+  document.getElementById('pd-findings').innerHTML =
+    [['Scoring window',f1],['Ratchet',f2],['Credit vs. cost',f3]]
+    .map(([h,t])=>`<div class="pd-finding"><div class="pd-finding-k">${h}</div>${t}</div>`).join('');
+
+  // Legend
+  const sw = (dash,color,w=2)=>`<svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="${color}" stroke-width="${w}" stroke-dasharray="${dash}" stroke-linecap="round"/></svg>`;
+  document.getElementById('pd-legend').innerHTML =
+    `<span class="pd-legend-item">${sw('','#252628')}Your design</span>`+
+    `<span class="pd-legend-item">${sw('4 3',PD_CMP,1.5)}${cmpName}</span>`+
+    `<span class="pd-legend-item">${sw('1 4',PD_REF,2.2)}Median cost / benchmark</span>`+
+    `<span class="pd-legend-item"><svg width="12" height="12"><circle cx="6" cy="6" r="4" fill="#fff" stroke="${PD_REF}" stroke-width="1.5"/></svg>Ratchet pause or reversal</span>`;
+
+  // Charts
+  const years = d.years;
+  let html='';
+  html += `<div class="pd-row-label"><b>Effective new-entrant credit vs. median capture cost</b> · real 2026 $/t, after indexing, monetization and credit-period levelization</div>`;
+  ['lo','hi','dac'].forEach(t=>{ html+=`<div class="pd-chart-cell" id="pdc-cr-${t}"></div>`; });
+  html += `<div class="pd-row-label"><b>New capacity online</b> · cumulative Mt/yr since 2027, against the ratchet benchmark</div>`;
+  ['lo','hi','dac'].forEach(t=>{ html+=`<div class="pd-chart-cell" id="pdc-cap-${t}"></div>`; });
+  document.getElementById('pd-charts').innerHTML = html;
+
+  ['lo','hi','dac'].forEach(t=>{
+    const R=d.tiers[t].rows, K=k.tiers[t].rows, col=PD_TIER[t].color;
+    const marks = R.map((r,i)=>r.event&&r.event.type!=='step'?{i,label:r.event.type==='pause'?`Paused at ${Math.round(r.event.ratio*100)}% of benchmark`:`Reversed at ${Math.round(r.event.ratio*100)}% of benchmark`}:null).filter(Boolean);
+    pdChart(`pdc-cr-${t}`, PD_TIER[t].long + (PD.apply[t]?'':' · flat'), years, [
+      {name:'Your design', v:R.map(r=>r.E), color:col, w:2, dash:'', step:true},
+      {name:cmpName, v:K.map(r=>r.E), color:PD_CMP, w:1.5, dash:'4 3', step:true},
+      {name:'Median cost', v:R.map(r=>r.costMid), color:PD_REF, w:2.2, dash:'1 4'},
+    ], {fmt:v=>'$'+Math.round(v), marks});
+    const empty = R.at(-1).C<0.05 && K.at(-1).C<0.05;
+    pdChart(`pdc-cap-${t}`, PD_TIER[t].long, years, [
+      {name:'Your design', v:R.map(r=>r.C), color:col, w:2, dash:''},
+      {name:cmpName, v:K.map(r=>r.C), color:PD_CMP, w:1.5, dash:'4 3'},
+      {name:'Benchmark', v:R.map(r=>r.traj), color:PD_REF, w:2.2, dash:'1 4'},
+    ], {fmt:v=>v.toFixed(v<10?1:0)+' Mt', empty: empty?'No capacity bankable on the credit alone':null});
+  });
+
+  // Vintage table
+  const starts=[]; for(let y=SIM.Y0;y<=SIM.YEND;y+=PD.interval) starts.push(y);
+  const cell = (t,y)=>{
+    const r=d.tiers[t].rows.find(x=>x.y===y);
+    let ev='';
+    if(!PD.apply[t]) ev = y===SIM.Y0?'<div class="pd-v-ev">no phase-down</div>':'';
+    else if(y===SIM.Y0) ev='<div class="pd-v-ev">starting level</div>';
+    else if(r.event){
+      const pct=Math.round(r.event.ratio*100);
+      if(r.event.type==='step') ev=`<div class="pd-v-ev">${r.stepF<=PD.floor/100+1e-9?'at floor':'−'+PD.step+'% step'} · ${pct>999?'>999':pct}% of benchmark</div>`;
+      else ev=`<div class="pd-v-ev pause">${r.event.type==='pause'?'paused':'reversed'} · ${r.C<0.05&&pct===0?'nothing deployed yet':pct+'% of benchmark'}</div>`;
+    }
+    return `<td><div class="pd-v-cr">$${Math.round(r.cr0)}</div>${ev}</td>`;
+  };
+  document.getElementById('pd-vintage').innerHTML =
+    `<tr><th>Entry period</th><th>Tier 1</th><th>Tier 2</th><th>DAC</th></tr>`+
+    starts.map(y=>{ const e=Math.min(SIM.YEND,y+PD.interval-1);
+      return `<tr><td class="pd-v-period">${y===e?y:y+'–'+e}</td>${cell('lo',y)}${cell('hi',y)}${cell('dac',y)}</tr>`; }).join('');
+
+  // Sector mix
+  const mix=[]; ['lo','hi','dac'].forEach(t=>d.tiers[t].bySector.forEach((s,i)=>mix.push({t,name:s.name.replace(' (U.S. pipeline)',''),dv:s.C,kv:k.tiers[t].bySector[i].C})));
+  const mMax=Math.max(1,...mix.flatMap(m=>[m.dv,m.kv]));
+  document.getElementById('pd-mix').innerHTML = mix.map(m=>`<div class="pd-mix-row">
+      <div class="pd-mix-name">${m.name}</div>
+      <div class="pd-mix-bars">
+        <div class="pd-mix-bar" style="width:${m.dv/mMax*100}%;background:${PD_TIER[m.t].color}"></div>
+        <div class="pd-mix-bar" style="width:${m.kv/mMax*100}%;background:${PD_CMP};opacity:0.55"></div>
+      </div>
+      <div class="pd-mix-val">${m.dv.toFixed(m.dv<10?1:0)}<br><span>${m.kv.toFixed(m.kv<10?1:0)}</span></div>
+    </div>`).join('');
+
+  // Sensitivity grid
+  const sens=document.getElementById('pd-sens');
+  if(!anyApply){ sens.innerHTML='<tr><td style="font-family:var(--font-body);font-size:13px;color:var(--ash);width:auto">Turn the phase-down on for at least one tier to see the sensitivity grid.</td></tr>'; }
+  else {
+    let s='<tr><th>Step</th><th>Every 3 years</th><th>Every 4 years</th><th>Every 5 years</th></tr>';
+    for(let st=5; st<=10; st++){
+      s+=`<tr><td>${st}%</td>`;
+      for(const iv of [3,4,5]){
+        const r=simulate({...pdCfg(c), step:st/100, interval:iv}, UNIVERSE_SECTORS);
+        const sv=nf.life$-r.life$, lo=nf.lifeMt-r.lifeMt;
+        const per = lo>1 ? `$${Math.round(sv*1000/lo).toLocaleString()} saved / t forgone` : 'no tonnes forgone';
+        const sel = st===PD.step && iv===PD.interval ? ' class="sel"' : '';
+        s+=`<td${sel} onclick="pdSetCell(${st},${iv})"><div class="pd-s-main">−${fB(sv)}</div><div class="pd-s-sub">${lo>1?'−'+fMt(lo):'0 Mt'}</div><div class="pd-s-sub">${per}</div></td>`;
+      }
+      s+='</tr>';
+    }
+    sens.innerHTML=s;
+  }
+}
+
+// Small-multiple line chart with hover crosshair
+function niceStep(v){ const p=Math.pow(10,Math.floor(Math.log10(v))); for(const m of [1,2,2.5,5,10]) if(m*p>=v) return m*p; return 10*p; }
+function niceMax(v){ const p=Math.pow(10,Math.floor(Math.log10(v))); for(const m of [1,1.5,2,2.5,3,4,5,6,8,10]) if(m*p>=v) return m*p; return 10*p; }
+function pdChart(id, title, years, series, opts){
+  const el=document.getElementById(id);
+  const W=340,H=176,ml=38,mr=10,mt=10,mb=22, iw=W-ml-mr, ih=H-mt-mb;
+  const raw=Math.max(1e-6,...series.flatMap(s=>s.v))*1.06;
+  const stepV=niceStep(raw/4), nT=Math.ceil(raw/stepV), yMax=stepV*nT;
+  const n=years.length, x=i=>ml+i*iw/(n-1), y=v=>mt+ih*(1-v/yMax);
+  let g='';
+  for(let k=0;k<=nT;k++){ const v=stepV*k, yy=y(v);
+    g+=`<line x1="${ml}" x2="${W-mr}" y1="${yy}" y2="${yy}" stroke="${k===0?'#252628':'#E6E3DC'}" stroke-width="1"/>`;
+    g+=`<text x="${ml-6}" y="${yy+3}" text-anchor="end" font-family="Inconsolata,monospace" font-size="9" fill="#6E6F69">${opts.fmt(v).replace(' Mt','')}</text>`; }
+  [2027,2030,2035,2040].forEach(yr=>{ const i=years.indexOf(yr); if(i<0) return;
+    g+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle" font-family="Inconsolata,monospace" font-size="9" fill="#6E6F69">${yr}</text>`; });
+  let p='';
+  if(opts.empty){
+    p+=`<text x="${ml+iw/2}" y="${mt+ih/2}" text-anchor="middle" font-family="Source Sans 3,sans-serif" font-size="11" fill="#6E6F69">${opts.empty}</text>`;
+  } else {
+    series.slice().reverse().forEach(s=>{
+      let dstr='';
+      s.v.forEach((v,i)=>{ dstr += i===0 ? `M${x(0)},${y(v)}` : s.step ? `H${x(i)}V${y(v)}` : `L${x(i)},${y(v)}`; });
+      p+=`<path d="${dstr}" fill="none" stroke="${s.color}" stroke-width="${s.w}" stroke-dasharray="${s.dash}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    });
+    (opts.marks||[]).forEach(m=>{ p+=`<circle cx="${x(m.i)}" cy="${y(series[0].v[m.i])}" r="4" fill="#fff" stroke="${PD_REF}" stroke-width="1.5"/>`; });
+  }
+  el.innerHTML = `<div class="pd-chart-title"><b>${title}</b></div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}">${g}${p}
+      <line class="pd-xh" x1="0" x2="0" y1="${mt}" y2="${mt+ih}" stroke="#252628" stroke-width="1" opacity="0"/>
+      <rect x="${ml}" y="${mt}" width="${iw}" height="${ih}" fill="transparent" class="pd-hit"/>
+    </svg><div class="pd-tip"></div>`;
+  if(opts.empty) return;
+  const svg=el.querySelector('svg'), xh=el.querySelector('.pd-xh'), tip=el.querySelector('.pd-tip'), hit=el.querySelector('.pd-hit');
+  hit.addEventListener('mousemove', e=>{
+    const rc=svg.getBoundingClientRect(), px=(e.clientX-rc.left)*W/rc.width;
+    const i=Math.max(0,Math.min(n-1,Math.round((px-ml)/(iw/(n-1)))));
+    xh.setAttribute('x1',x(i)); xh.setAttribute('x2',x(i)); xh.setAttribute('opacity',0.35);
+    const mk=(opts.marks||[]).find(m=>m.i===i);
+    tip.innerHTML = `<b>${years[i]}</b><br>`+series.map(s=>`<span class="k"><svg width="12" height="6"><line x1="0" y1="3" x2="12" y2="3" stroke="${s.color}" stroke-width="2" stroke-dasharray="${s.dash}"/></svg></span>${s.name}: <b>${opts.fmt(s.v[i])}</b>`).join('<br>')+(mk?`<br><span style="color:${PD_REF}">${mk.label}</span>`:'');
+    tip.style.display='block';
+    const cx=x(i)*rc.width/W;
+    tip.style.left = (cx > rc.width*0.55 ? cx - tip.offsetWidth - 12 : cx + 12)+'px';
+    tip.style.top = '28px';
+  });
+  hit.addEventListener('mouseleave', ()=>{ tip.style.display='none'; xh.setAttribute('opacity',0); });
+}
+
+update();
+</script>
+</body>
+</html>
